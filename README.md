@@ -1,15 +1,15 @@
-# dirtree
+# PrintDirTree
 
-`dirtree` is a command-line utility that prints the structure of a directory tree, 
+`printdirtree` is a command-line utility that prints the structure of a directory tree, 
 offering the flexibility to specify files and directories to exclude. This tool 
 is very useful to aid with prompting ChatGPT. 
 
 ## Installation
 
-Install `dirtree` easily with pip:
+Install `printdirtree` easily with pip:
 
 ```sh
-pip install dirtree
+pip install printdirtree
 ```
 
 ## Usage
@@ -18,7 +18,7 @@ To use `dirtree`, simply run the command followed by optional arguments to tailo
 The basic usage prints the current directory structure:
 
 ```sh
-dirtree
+printdirtree
 ```
 
 ### Specifying a Directory
@@ -26,7 +26,7 @@ dirtree
 To print the structure of a specific directory:
 
 ```sh
-dirtree --dir /path/to/directory
+printdirtree --dir /path/to/directory
 ```
 
 ### Excluding Directories and Files
@@ -34,7 +34,7 @@ dirtree --dir /path/to/directory
 Exclude specific directories and/or file patterns:
 
 ```sh
-dirtree --exclude-dir node_modules --exclude-dir .git --exclude-file "*.log"
+printdirtree --exclude-dir node_modules --exclude-dir .git --exclude-file "*.log"
 ```
 
 ### Saving Preferences
@@ -42,7 +42,7 @@ dirtree --exclude-dir node_modules --exclude-dir .git --exclude-file "*.log"
 To save your exclusions for future runs:
 
 ```sh
-dirtree --exclude-dir temp --exclude-file "*.tmp" --save
+printdirtree --exclude-dir temp --exclude-file "*.tmp" --save
 ```
 
 ### Viewing Current Exclusions
@@ -50,7 +50,7 @@ dirtree --exclude-dir temp --exclude-file "*.tmp" --save
 See what exclusions are currently saved:
 
 ```sh
-dirtree --view-exclusions
+printdirtree --view-exclusions
 ```
 
 ### Including Directories and Files Back
@@ -58,5 +58,5 @@ dirtree --view-exclusions
 To remove exclusions and include directories or files back into the printout:
 
 ```sh
-dirtree --include-dir temp --include-file "*.tmp" --save
+printdirtree --include-dir temp --include-file "*.tmp" --save
 ```
