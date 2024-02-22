@@ -1,0 +1,8 @@
+dirtree/
+├── dirtree/
+│   ├── __init__.py
+│   └── __main__.py
+├── README.md
+├── LICENSE
+├── MANIFEST.in
+└── setup.py
