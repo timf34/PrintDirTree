@@ -10,7 +10,7 @@ DEFAULT_PREFS: Dict[str, Set[str]] = {
     "EXCLUDE_FILES": {"LICENSE", "*.jpg"}
 }
 
-PREFS_FILE: str = "dir_tree_prefs.json"
+PREFS_FILE: str = "../dir_tree_prefs.json"
 
 
 def view_exclusions(prefs: Dict[str, Set[str]]) -> None:
@@ -50,6 +50,7 @@ def load_preferences() -> Dict[str, Set[str]]:
         print(f"Error loading preferences: {e}. Using default preferences.")
     return DEFAULT_PREFS
 
+
 def save_preferences(prefs: Dict[str, Set[str]]) -> None:
     """
     Save preferences to a JSON file, converting sets to lists for JSON serialization.
@@ -60,7 +61,6 @@ def save_preferences(prefs: Dict[str, Set[str]]) -> None:
             json.dump(serializable_prefs, file, indent=4)
     except IOError as e:
         print(f"Error saving preferences: {e}. Changes might not be saved.")
-
 
 
 def update_and_optionally_save_preferences(args: argparse.Namespace, prefs: Dict[str, Set[str]]) -> None:
