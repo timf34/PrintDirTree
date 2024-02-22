@@ -1,5 +1,5 @@
-dirtree/
-├── dirtree/
+printdirtree/
+├── printdirtree/
 │   ├── __init__.py
 │   └── __main__.py
 ├── README.md
