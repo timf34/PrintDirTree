@@ -41,20 +41,26 @@ def load_preferences() -> Dict[str, Set[str]]:
     """
     Load preferences from a JSON file, converting lists back to sets.
     """
-    if os.path.exists(PREFS_FILE):
-        with open(PREFS_FILE, "r") as file:
-            loaded_prefs = json.load(file)
-            return {key: set(value) for key, value in loaded_prefs.items()}
+    try:
+        if os.path.exists(PREFS_FILE):
+            with open(PREFS_FILE, "r") as file:
+                loaded_prefs = json.load(file)
+                return {key: set(value) for key, value in loaded_prefs.items()}
+    except json.JSONDecodeError as e:
+        print(f"Error loading preferences: {e}. Using default preferences.")
     return DEFAULT_PREFS
-
 
 def save_preferences(prefs: Dict[str, Set[str]]) -> None:
     """
     Save preferences to a JSON file, converting sets to lists for JSON serialization.
     """
-    serializable_prefs = {key: list(value) for key, value in prefs.items()}
-    with open(PREFS_FILE, "w") as file:
-        json.dump(serializable_prefs, file, indent=4)
+    try:
+        serializable_prefs = {key: list(value) for key, value in prefs.items()}
+        with open(PREFS_FILE, "w") as file:
+            json.dump(serializable_prefs, file, indent=4)
+    except IOError as e:
+        print(f"Error saving preferences: {e}. Changes might not be saved.")
+
 
 
 def update_and_optionally_save_preferences(args: argparse.Namespace, prefs: Dict[str, Set[str]]) -> None:
