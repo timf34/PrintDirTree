@@ -13,6 +13,30 @@ DEFAULT_PREFS: Dict[str, Set[str]] = {
 PREFS_FILE: str = "dir_tree_prefs.json"
 
 
+def view_exclusions(prefs: Dict[str, Set[str]]) -> None:
+    """
+    Display the current excluded directories and files.
+    """
+    print("Currently excluded directories:")
+    for d in sorted(prefs["EXCLUDE_DIRS"]):
+        print(f"  - {d}")
+    print("\nCurrently excluded files:")
+    for f in sorted(prefs["EXCLUDE_FILES"]):
+        print(f"  - {f}")
+
+
+def include_back_preferences(args: argparse.Namespace, prefs: Dict[str, Set[str]]) -> None:
+    """
+    Include directories or files back into the directory tree.
+    """
+    if args.include_dir:
+        prefs["EXCLUDE_DIRS"].difference_update(args.include_dir)
+    if args.include_file:
+        prefs["EXCLUDE_FILES"].difference_update(args.include_file)
+    if args.save:
+        save_preferences(prefs)
+
+
 def load_preferences() -> Dict[str, Set[str]]:
     """
     Load preferences from a JSON file, converting lists back to sets.
@@ -86,10 +110,21 @@ def main() -> None:
     parser.add_argument('--exclude-file', type=str, nargs='*',
                         help='Files or file patterns to exclude from the printout.')
     parser.add_argument('--save', action='store_true', help='Save the specified exclusions for future runs.')
+    parser.add_argument('--view-exclusions', action='store_true',
+                        help='View the current excluded directories and files.')
+    parser.add_argument('--include-dir', type=str, nargs='*',
+                        help='Directories to include back into the printout.')
+    parser.add_argument('--include-file', type=str, nargs='*',
+                        help='Files or file patterns to include back into the printout.')
 
     args = parser.parse_args()
 
+    if args.view_exclusions:
+        view_exclusions(prefs)
+        return
+
     update_and_optionally_save_preferences(args, prefs)
+    include_back_preferences(args, prefs)  # Include specified items back
 
     dir_path = args.dir
     if not os.path.isdir(dir_path):
