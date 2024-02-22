@@ -60,3 +60,24 @@ To remove exclusions and include directories or files back into the printout:
 ```sh
 printdirtree --include-dir temp --include-file "*.tmp" --save
 ```
+
+## Example Usage
+
+After installing `printdirtree`, you can run it to visualize the structure of your project directory. Here's an example command that excludes `.git` files:
+
+```sh
+printdirtree --exclude-file ".git"
+```
+
+Output for the `PrintDirTree` project might look like this:
+
+```
+PrintDirTree
+├── MANIFEST.in
+├── README.md
+├── dir_tree_prefs.json
+├── printdirtree
+│   ├── __init__.py
+│   └── __main__.py
+└── setup.py
+```
