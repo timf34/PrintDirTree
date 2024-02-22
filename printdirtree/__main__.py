@@ -6,8 +6,8 @@ from typing import List, Set, Dict
 
 # Default preferences
 DEFAULT_PREFS: Dict[str, Set[str]] = {
-    "EXCLUDE_DIRS": {'venv', 'env', 'node_modules', 'dist', '.idea', '.git', '__pycache__'},
-    "EXCLUDE_FILES": {"LICENSE", "*.jpg"}
+    "EXCLUDE_DIRS": {'venv', 'env', 'node_modules', 'dist', '.idea', '.expo', '.git', '__pycache__'},
+    "EXCLUDE_FILES": {"LICENSE"}
 }
 
 PREFS_FILE: str = "../dir_tree_prefs.json"
