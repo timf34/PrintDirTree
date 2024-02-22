@@ -1,7 +1,7 @@
 # PrintDirTree
 
 `printdirtree` is a command-line utility that prints the structure of a directory tree, 
-allowing to specify files and directories to exclude. 
+allowing you to easily specify files and directories to exclude. 
 
 This tool is very useful to aid with prompting ChatGPT. 
 
