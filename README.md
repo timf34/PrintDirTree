@@ -15,7 +15,7 @@ pip install printdirtree
 
 ## Usage
 
-To use `dirtree`, simply run the command followed by optional arguments to tailor the output to your needs. 
+To use `printdirtree`, simply run the command followed by optional arguments to tailor the output to your needs. 
 The basic usage prints the current directory structure:
 
 ```sh
