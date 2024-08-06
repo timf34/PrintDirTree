@@ -76,7 +76,6 @@ Output for the `PrintDirTree` project might look like this:
 PrintDirTree
 ├── MANIFEST.in
 ├── README.md
-├── dir_tree_prefs.json
 ├── printdirtree
 │   ├── __init__.py
 │   └── __main__.py
