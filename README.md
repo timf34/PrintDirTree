@@ -3,6 +3,19 @@
 `printdirtree` is a command-line utility that prints the structure of a directory tree, 
 allowing you to easily specify files and directories to exclude. 
 
+**Example:**
+
+```bash
+$ printdirtree
+PrintDirTree
+├── MANIFEST.in
+├── README.md
+├── printdirtree
+│   ├── __init__.py
+│   └── __main__.py
+└── setup.py
+```
+
 This tool is very useful to aid with prompting ChatGPT. 
 
 ## Installation
