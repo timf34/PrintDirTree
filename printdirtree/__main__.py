@@ -82,14 +82,18 @@ def file_should_be_excluded(file_name: str, exclude_files: Set[str]) -> bool:
     return any(fnmatch.fnmatch(file_name, pattern) for pattern in exclude_files)
 
 
-def print_dir_structure(dir_path: str, exclude_dirs: Set[str], exclude_files: Set[str], prefix: str = '') -> None:
+def print_dir_structure(dir_path: str, exclude_dirs: Set[str], exclude_files: Set[str], prefix: str = '', dirs_only: bool = False) -> None:
     """
     Print the directory structure for the given path, excluding specified directories and files.
+    If dirs_only is True, only print directories.
     """
     items: List[str] = os.listdir(dir_path)
     filtered_items: List[str] = [item for item in items if
                                  item not in exclude_dirs and not file_should_be_excluded(item, exclude_files)]
     filtered_items.sort()
+
+    if dirs_only:
+        filtered_items = [item for item in filtered_items if os.path.isdir(os.path.join(dir_path, item))]
 
     for i, item in enumerate(filtered_items, start=1):
         item_path: str = os.path.join(dir_path, item)
@@ -97,8 +101,8 @@ def print_dir_structure(dir_path: str, exclude_dirs: Set[str], exclude_files: Se
             branch_char: str = '└── ' if i == len(filtered_items) else '├── '
             print(f"{prefix}{branch_char}{item}")
             next_prefix: str = f"{prefix}{'    ' if i == len(filtered_items) else '│   '}"
-            print_dir_structure(item_path, exclude_dirs, exclude_files, next_prefix)
-        else:
+            print_dir_structure(item_path, exclude_dirs, exclude_files, next_prefix, dirs_only)
+        elif not dirs_only:
             branch_char: str = '└── ' if i == len(filtered_items) else '├── '
             print(f"{prefix}{branch_char}{item}")
 
@@ -122,6 +126,7 @@ def main() -> None:
                         help='Directories to include back into the printout.')
     parser.add_argument('--include-file', type=str, nargs='*',
                         help='Files or file patterns to include back into the printout.')
+    parser.add_argument('--dirs-only', action='store_true', help='Print only directories, excluding files')
 
     args = parser.parse_args()
 
@@ -138,7 +143,7 @@ def main() -> None:
         return
 
     print(os.path.basename(dir_path))
-    print_dir_structure(dir_path, set(prefs["EXCLUDE_DIRS"]), set(prefs["EXCLUDE_FILES"]))
+    print_dir_structure(dir_path, set(prefs["EXCLUDE_DIRS"]), set(prefs["EXCLUDE_FILES"]), dirs_only=args.dirs_only)
 
 
 if __name__ == '__main__':
