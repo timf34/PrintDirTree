@@ -2,6 +2,9 @@ import os
 import fnmatch
 import argparse
 import json
+import pyperclip
+import io 
+import sys 
 from typing import List, Set, Dict
 
 # Default preferences
@@ -82,11 +85,12 @@ def file_should_be_excluded(file_name: str, exclude_files: Set[str]) -> bool:
     return any(fnmatch.fnmatch(file_name, pattern) for pattern in exclude_files)
 
 
-def print_dir_structure(dir_path: str, exclude_dirs: Set[str], exclude_files: Set[str], prefix: str = '', dirs_only: bool = False) -> None:
-    """
-    Print the directory structure for the given path, excluding specified directories and files.
-    If dirs_only is True, only print directories.
-    """
+def print_dir_structure(dir_path: str, exclude_dirs: Set[str], exclude_files: Set[str], prefix: str = '', dirs_only: bool = False) -> str:
+    output = io.StringIO()
+    
+    def print_to_string(*args, **kwargs):
+        print(*args, file=output, **kwargs)
+    
     items: List[str] = os.listdir(dir_path)
     filtered_items: List[str] = [item for item in items if
                                  item not in exclude_dirs and not file_should_be_excluded(item, exclude_files)]
@@ -99,12 +103,14 @@ def print_dir_structure(dir_path: str, exclude_dirs: Set[str], exclude_files: Se
         item_path: str = os.path.join(dir_path, item)
         if os.path.isdir(item_path):
             branch_char: str = '└── ' if i == len(filtered_items) else '├── '
-            print(f"{prefix}{branch_char}{item}")
+            print_to_string(f"{prefix}{branch_char}{item}")
             next_prefix: str = f"{prefix}{'    ' if i == len(filtered_items) else '│   '}"
-            print_dir_structure(item_path, exclude_dirs, exclude_files, next_prefix, dirs_only)
+            print_to_string(print_dir_structure(item_path, exclude_dirs, exclude_files, next_prefix, dirs_only), end='')
         elif not dirs_only:
             branch_char: str = '└── ' if i == len(filtered_items) else '├── '
-            print(f"{prefix}{branch_char}{item}")
+            print_to_string(f"{prefix}{branch_char}{item}")
+    
+    return output.getvalue()
 
 
 def main() -> None:
@@ -127,6 +133,7 @@ def main() -> None:
     parser.add_argument('--include-file', type=str, nargs='*',
                         help='Files or file patterns to include back into the printout.')
     parser.add_argument('--dirs-only', action='store_true', help='Print only directories, excluding files')
+    parser.add_argument('-c', '--copy-to-clipboard', action='store_true', help='Copy the output to clipboard')
 
     args = parser.parse_args()
 
@@ -142,8 +149,15 @@ def main() -> None:
         print(f"The specified directory does not exist: {dir_path}")
         return
 
-    print(os.path.basename(dir_path))
-    print_dir_structure(dir_path, set(prefs["EXCLUDE_DIRS"]), set(prefs["EXCLUDE_FILES"]), dirs_only=args.dirs_only)
+    root_dir = os.path.basename(dir_path)
+    output = f"{root_dir}\n"
+    output += print_dir_structure(dir_path, set(prefs["EXCLUDE_DIRS"]), set(prefs["EXCLUDE_FILES"]), dirs_only=args.dirs_only)
+
+    if args.copy_to_clipboard:
+        pyperclip.copy(output)
+        print("Directory structure has been copied to clipboard.")
+    
+    print(output)
 
 
 if __name__ == '__main__':
