@@ -77,6 +77,30 @@ To remove exclusions and include directories or files back into the printout:
 printdirtree --include-dir temp --include-file "*.tmp" --save
 ```
 
+### Showing File Contents
+
+To display both the directory structure and the contents of all files:
+
+```sh
+printdirtree --show-contents
+```
+
+This will output the directory tree followed by each file's contents with its relative path as a comment. For example:
+
+```
+temp
+├── a.py
+└── b.py
+
+# temp/a.py
+print("a.py")
+
+# temp/b.py
+print("b.py")
+```
+
+This is particularly useful when sharing code with LLMs, as it provides both structure and content in a clear, readable format.
+
 ## Example Usage
 
 After installing `printdirtree`, you can run it to visualize the structure of your project directory. Here's an example command that excludes `.git` files:
