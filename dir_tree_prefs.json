@@ -1,0 +1,14 @@
+{
+    "EXCLUDE_DIRS": [
+        "__pycache__",
+        ".git",
+        ".idea",
+        "dist",
+        "media",
+        "node_modules",
+        "venv"
+    ],
+    "EXCLUDE_FILES": [
+        "LICENSE"
+    ]
+}

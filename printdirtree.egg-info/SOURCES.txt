@@ -1,0 +1,12 @@
+LICENSE
+MANIFEST.in
+README.md
+setup.py
+printdirtree/__init__.py
+printdirtree/__main__.py
+printdirtree.egg-info/PKG-INFO
+printdirtree.egg-info/SOURCES.txt
+printdirtree.egg-info/dependency_links.txt
+printdirtree.egg-info/entry_points.txt
+printdirtree.egg-info/requires.txt
+printdirtree.egg-info/top_level.txt

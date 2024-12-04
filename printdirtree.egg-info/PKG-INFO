@@ -1,9 +1,19 @@
+Metadata-Version: 2.1
+Name: printdirtree
+Version: 0.1.4
+Summary: A CLI utility to print the directory tree structure with customizable exclusions.
+Home-page: https://github.com/timf34/PrintDirTree
+Author: Tim Farrelly
+Author-email: timf34@gmail.com
+Requires-Python: >=3.6
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: pyperclip
+
 # PrintDirTree
 
 `printdirtree` is a command-line utility that prints the structure of a directory tree, 
 allowing you to easily specify files and directories to exclude. 
-
-You can now also print the contents of all files, which is very useful for prompting LLMs. 
 
 **Example:**
 

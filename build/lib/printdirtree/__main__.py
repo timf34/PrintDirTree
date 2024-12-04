@@ -5,7 +5,7 @@ import json
 import pyperclip
 import io 
 import sys 
-from typing import List, Set, Dict, Tuple
+from typing import List, Set, Dict
 
 # Default preferences
 DEFAULT_PREFS: Dict[str, Set[str]] = {
@@ -85,41 +85,12 @@ def file_should_be_excluded(file_name: str, exclude_files: Set[str]) -> bool:
     return any(fnmatch.fnmatch(file_name, pattern) for pattern in exclude_files)
 
 
-def read_file_contents(file_path: str) -> str:
-    """
-    Read and return the contents of a file, handling potential errors.
-    """
-    try:
-        with open(file_path, 'r', encoding='utf-8') as f:
-            return f.read().strip()
-    except UnicodeDecodeError:
-        return "[Binary file]"
-    except Exception as e:
-        return f"[Error reading file: {str(e)}]"
-
-
-def print_dir_structure(
-        dir_path: str,
-        exclude_dirs: Set[str],
-        exclude_files: Set[str],
-        prefix: str = '',
-        dirs_only: bool = False,
-        show_contents: bool = False,
-        root_path: str = None
-) -> Tuple[str, List[Tuple[str, str]]]:
-    """
-    Print directory structure and optionally collect file contents.
-    Returns a tuple of (tree_structure, list of (relative_path, content) pairs).
-    """
+def print_dir_structure(dir_path: str, exclude_dirs: Set[str], exclude_files: Set[str], prefix: str = '', dirs_only: bool = False) -> str:
     output = io.StringIO()
-    file_contents = []
-
-    if root_path is None:
-        root_path = dir_path
-
+    
     def print_to_string(*args, **kwargs):
         print(*args, file=output, **kwargs)
-
+    
     items: List[str] = os.listdir(dir_path)
     filtered_items: List[str] = [item for item in items if
                                  item not in exclude_dirs and not file_should_be_excluded(item, exclude_files)]
@@ -134,22 +105,12 @@ def print_dir_structure(
             branch_char: str = '└── ' if i == len(filtered_items) else '├── '
             print_to_string(f"{prefix}{branch_char}{item}")
             next_prefix: str = f"{prefix}{'    ' if i == len(filtered_items) else '│   '}"
-            subtree, subcontents = print_dir_structure(
-                item_path, exclude_dirs, exclude_files, next_prefix,
-                dirs_only, show_contents, root_path
-            )
-            print_to_string(subtree, end='')
-            file_contents.extend(subcontents)
+            print_to_string(print_dir_structure(item_path, exclude_dirs, exclude_files, next_prefix, dirs_only), end='')
         elif not dirs_only:
             branch_char: str = '└── ' if i == len(filtered_items) else '├── '
             print_to_string(f"{prefix}{branch_char}{item}")
-
-            if show_contents:
-                rel_path = os.path.relpath(item_path, root_path)
-                content = read_file_contents(item_path)
-                file_contents.append((rel_path, content))
-
-    return output.getvalue(), file_contents
+    
+    return output.getvalue()
 
 
 def main() -> None:
@@ -173,8 +134,6 @@ def main() -> None:
                         help='Files or file patterns to include back into the printout.')
     parser.add_argument('--dirs-only', action='store_true', help='Print only directories, excluding files')
     parser.add_argument('-c', '--copy-to-clipboard', action='store_true', help='Copy the output to clipboard')
-    parser.add_argument('-p', '--show-contents', action='store_true',
-                        help='Show the contents of each file after the tree structure')
 
     args = parser.parse_args()
 
@@ -191,26 +150,13 @@ def main() -> None:
         return
 
     root_dir = os.path.basename(dir_path)
-    tree_output = f"{root_dir}\n"
-    tree_structure, file_contents = print_dir_structure(
-        dir_path,
-        set(prefs["EXCLUDE_DIRS"]),
-        set(prefs["EXCLUDE_FILES"]),
-        dirs_only=args.dirs_only,
-        show_contents=args.show_contents
-    )
-
-    output = tree_output + tree_structure
-
-    if args.show_contents and file_contents:
-        output += "\n"  # Add a blank line between tree and contents
-        for rel_path, content in file_contents:
-            output += f"\n# {rel_path}\n{content}\n"
+    output = f"{root_dir}\n"
+    output += print_dir_structure(dir_path, set(prefs["EXCLUDE_DIRS"]), set(prefs["EXCLUDE_FILES"]), dirs_only=args.dirs_only)
 
     if args.copy_to_clipboard:
         pyperclip.copy(output)
         print("Directory structure has been copied to clipboard.")
-
+    
     print(output)
 
 

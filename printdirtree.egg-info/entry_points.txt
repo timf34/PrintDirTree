@@ -1,0 +1,2 @@
+[console_scripts]
+printdirtree = printdirtree.__main__:main

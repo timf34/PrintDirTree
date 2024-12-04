@@ -8,7 +8,7 @@ with open(os.path.join(here, 'README.md'), encoding='utf-8') as f:
 
 setup(
     name='printdirtree',
-    version='0.1.4',
+    version='0.1.5',
     packages=find_packages(),
     url="https://github.com/timf34/PrintDirTree",
     entry_points={
