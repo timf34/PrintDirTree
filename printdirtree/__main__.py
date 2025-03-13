@@ -85,6 +85,29 @@ def file_should_be_excluded(file_name: str, exclude_files: Set[str]) -> bool:
     return any(fnmatch.fnmatch(file_name, pattern) for pattern in exclude_files)
 
 
+def path_should_be_excluded(rel_path: str, exclude_dirs: Set[str]) -> bool:
+    """
+    Check if a path or any of its parent directories should be excluded.
+    This handles both direct matches and path pattern matches.
+    """
+    # Check for direct match of the full relative path
+    if rel_path in exclude_dirs:
+        return True
+
+    # Check if path matches any exclusion patterns
+    for pattern in exclude_dirs:
+        # Handle path patterns (with slashes)
+        if '/' in pattern and fnmatch.fnmatch(rel_path, pattern):
+            return True
+
+        # Handle directory name patterns (just the basename)
+        path_parts = rel_path.split(os.sep)
+        if any(fnmatch.fnmatch(part, pattern) for part in path_parts):
+            return True
+
+    return False
+
+
 def read_file_contents(file_path: str) -> str:
     """
     Read and return the contents of a file, handling potential errors.
@@ -105,7 +128,8 @@ def print_dir_structure(
         prefix: str = '',
         dirs_only: bool = False,
         show_contents: bool = False,
-        root_path: str = None
+        root_path: str = None,
+        current_rel_path: str = ''
 ) -> Tuple[str, List[Tuple[str, str]]]:
     """
     Print directory structure and optionally collect file contents.
@@ -121,14 +145,26 @@ def print_dir_structure(
         print(*args, file=output, **kwargs)
 
     items: List[str] = os.listdir(dir_path)
-    filtered_items: List[str] = [item for item in items if
-                                 item not in exclude_dirs and not file_should_be_excluded(item, exclude_files)]
-    filtered_items.sort()
+    filtered_items: List[str] = []
+
+    for item in sorted(items):
+        item_path = os.path.join(dir_path, item)
+        item_rel_path = os.path.join(current_rel_path, item) if current_rel_path else item
+
+        # Check if this item or its path should be excluded
+        if path_should_be_excluded(item_rel_path, exclude_dirs):
+            continue
+
+        if os.path.isfile(item_path) and file_should_be_excluded(item, exclude_files):
+            continue
+
+        filtered_items.append((item, item_rel_path))
 
     if dirs_only:
-        filtered_items = [item for item in filtered_items if os.path.isdir(os.path.join(dir_path, item))]
+        filtered_items = [(item, rel_path) for item, rel_path in filtered_items if
+                          os.path.isdir(os.path.join(dir_path, item))]
 
-    for i, item in enumerate(filtered_items, start=1):
+    for i, (item, item_rel_path) in enumerate(filtered_items, start=1):
         item_path: str = os.path.join(dir_path, item)
         if os.path.isdir(item_path):
             branch_char: str = '└── ' if i == len(filtered_items) else '├── '
@@ -136,7 +172,7 @@ def print_dir_structure(
             next_prefix: str = f"{prefix}{'    ' if i == len(filtered_items) else '│   '}"
             subtree, subcontents = print_dir_structure(
                 item_path, exclude_dirs, exclude_files, next_prefix,
-                dirs_only, show_contents, root_path
+                dirs_only, show_contents, root_path, item_rel_path
             )
             print_to_string(subtree, end='')
             file_contents.extend(subcontents)
@@ -161,7 +197,8 @@ def main() -> None:
     parser = argparse.ArgumentParser(description='Print the directory tree structure with customizable exclusions.')
     parser.add_argument('--dir', type=str, default=os.getcwd(),
                         help='The directory path to print the structure of. Defaults to the current directory.')
-    parser.add_argument('--exclude-dir', type=str, nargs='*', help='Directories to exclude from the printout.')
+    parser.add_argument('--exclude-dir', type=str, nargs='*',
+                        help='Directories or path patterns to exclude from the printout.')
     parser.add_argument('--exclude-file', type=str, nargs='*',
                         help='Files or file patterns to exclude from the printout.')
     parser.add_argument('--save', action='store_true', help='Save the specified exclusions for future runs.')
