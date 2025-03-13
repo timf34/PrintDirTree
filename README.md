@@ -101,6 +101,12 @@ print("b.py")
 
 This is particularly useful when sharing code with LLMs, as it provides both structure and content in a clear, readable format.
 
+
+### Copy output to clipboard 
+
+Just use the `-c` flag!
+
+
 ## Example Usage
 
 After installing `printdirtree`, you can run it to visualize the structure of your project directory. Here's an example command that excludes `.git` files:
