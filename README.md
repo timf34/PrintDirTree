@@ -107,6 +107,11 @@ This is particularly useful when sharing code with LLMs, as it provides both str
 Just use the `-c` flag!
 
 
+### Print file outputs too!
+
+Just use the `-p` flag!
+
+
 ## Example Usage
 
 After installing `printdirtree`, you can run it to visualize the structure of your project directory. Here's an example command that excludes `.git` files:
