@@ -84,6 +84,10 @@ To display both the directory structure and the contents of all files:
 ```sh
 printdirtree --show-contents
 ```
+or just `-p`:
+```sh
+printdirtree -p
+```
 
 This will output the directory tree followed by each file's contents with its relative path as a comment. For example:
 
