@@ -15,6 +15,30 @@ DEFAULT_PREFS: Dict[str, Set[str]] = {
 
 PREFS_FILE: str = "../dir_tree_prefs.json"
 
+def load_gitignore_patterns(dir_path: str) -> Tuple[Set[str], Set[str]]:
+    """
+    Load simple .gitignore rules from the specified directory.
+    Returns a tuple of (exclude_dirs, exclude_files).
+    """
+    exclude_dirs = set()
+    exclude_files = set()
+    gitignore_path = os.path.join(dir_path, '.gitignore')
+    if os.path.isfile(gitignore_path):
+        try:
+            with open(gitignore_path, 'r', encoding='utf-8') as f:
+                for line in f:
+                    line = line.strip()
+                    if not line or line.startswith('#') or line.startswith('!'):
+                        continue
+                    if line.endswith('/'):
+                        exclude_dirs.add(line[:-1])
+                    else:
+                        exclude_dirs.add(line)
+                        exclude_files.add(line)
+        except Exception as e:
+            print(f"Error reading .gitignore: {e}")
+    return exclude_dirs, exclude_files
+
 
 def view_exclusions(prefs: Dict[str, Set[str]]) -> None:
     """
@@ -212,6 +236,8 @@ def main() -> None:
     parser.add_argument('-c', '--copy-to-clipboard', action='store_true', help='Copy the output to clipboard')
     parser.add_argument('-p', '--show-contents', action='store_true',
                         help='Show the contents of each file after the tree structure')
+    parser.add_argument('--no-gitignore', action='store_true',
+                        help='Do not automatically respect .gitignore rules')
 
     args = parser.parse_args()
 
@@ -227,12 +253,20 @@ def main() -> None:
         print(f"The specified directory does not exist: {dir_path}")
         return
 
+    gitignore_dirs = set()
+    gitignore_files = set()
+    if not args.no_gitignore:
+        gitignore_dirs, gitignore_files = load_gitignore_patterns(dir_path)
+
+    combined_exclude_dirs = set(prefs["EXCLUDE_DIRS"]) | gitignore_dirs
+    combined_exclude_files = set(prefs["EXCLUDE_FILES"]) | gitignore_files
+
     root_dir = os.path.basename(dir_path)
     tree_output = f"{root_dir}\n"
     tree_structure, file_contents = print_dir_structure(
         dir_path,
-        set(prefs["EXCLUDE_DIRS"]),
-        set(prefs["EXCLUDE_FILES"]),
+        combined_exclude_dirs,
+        combined_exclude_files,
         dirs_only=args.dirs_only,
         show_contents=args.show_contents
     )
