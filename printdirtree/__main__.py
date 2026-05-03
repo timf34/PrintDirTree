@@ -30,12 +30,15 @@ def load_gitignore_patterns(dir_path: str) -> Tuple[Set[str], Set[str]]:
                     line = line.strip()
                     if not line or line.startswith('#') or line.startswith('!'):
                         continue
+                    # Strip leading slash so rooted patterns like "/build" match
+                    if line.startswith('/'):
+                        line = line[1:]
                     if line.endswith('/'):
                         exclude_dirs.add(line[:-1])
                     else:
                         exclude_dirs.add(line)
                         exclude_files.add(line)
-        except Exception as e:
+        except OSError as e:
             print(f"Error reading .gitignore: {e}")
     return exclude_dirs, exclude_files
 
